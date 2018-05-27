@@ -1,0 +1,18 @@
+apply plugin: 'application'
+mainClassName = 'Main'
+
+def mpjHome = System.getenv('MPJ_HOME')
+def mpjStarter = files("$mpjHome/lib/starter.jar")
+def mpjJar = files("$mpjHome/lib/mpj.jar")
+def mpjClasspath = sourceSets.main.runtimeClasspath - mpjJar
+
+dependencies {
+    compile mpjJar
+}
+
+run {
+    main = 'runtime.starter.MPJRun'
+    classpath = mpjStarter
+    args mainClassName, '-cp', mpjClasspath.asPath, '-np', 4
+    dependsOn classes
+}
