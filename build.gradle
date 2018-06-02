@@ -13,6 +13,6 @@ dependencies {
 run {
     main = 'runtime.starter.MPJRun'
     classpath = mpjStarter
-    args mainClassName, '-cp', mpjClasspath.asPath, '-np', 4
+    args mainClassName, '-cp', mpjClasspath.asPath, '-np', 3
     dependsOn classes
 }
