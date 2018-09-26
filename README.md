@@ -1,4 +1,4 @@
-# DistMonitor
+# Distributed Monitor
 Application written within NPR subject.
 
  Project realization is in progress...
