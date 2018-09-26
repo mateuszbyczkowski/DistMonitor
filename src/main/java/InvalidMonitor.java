@@ -77,8 +77,8 @@ public class InvalidMonitor {
                         //conditionalVariable.notify_one();
                         //TODO notify conditional variable
                     }
-                } else if (true) {
-
+                } else if (status.tag == MessageType.DATA.getValue()) {
+                    //receive data bytes
                 }
             }
         });
@@ -86,29 +86,25 @@ public class InvalidMonitor {
     }
 
     public void lock() {
-        //std::unique_lock<std::mutex> lock(mutex);
-        enterCriticalSection(new Mutex());
+        enterCriticalSection();
     }
 
     public void unlock() {
-        //std::unique_lock<std::mutex> lock(mutex);
         releaseCriticalSection();
     }
 
-    public void wait(int id) {
-        //std::unique_lock<std::mutex> lock(mutex);
+    public void wait(int id) throws InterruptedException {
+        wait();
         broadcastWait(id);
         releaseCriticalSection();
         waitAt = id;
         conditionalNotified = false;
-        /*conditionalVariable.wait(lock, [this]() -> bool {
-            return conditionalNotified;
-        });*/
-        enterCriticalSection(new Mutex());
+        //conditionalVariable.wait() ?
+        enterCriticalSection();
     }
 
-    public void notifyAll(int id) {
-        //std::unique_lock<std::mutex> lock(mutex);
+    public void notifyAll(int id) throws InterruptedException {
+        wait();
         if (awaitings.containsKey(id)) {
             ArrayList<Integer> awaitingsArray = awaitings.get(id);
             for (int i = 0; i < awaitingsArray.size(); i++) {
@@ -128,14 +124,19 @@ public class InvalidMonitor {
         }
     }
 
-    private void enterCriticalSection(Mutex lock) {
+    private void enterCriticalSection() {
         waitForToken = true;
         sendEnterCriticalSectionRequest();
 
         if (token == null) {
-            /*conditionalVariable.wait(lock, [this]() -> bool {
-                return allowedToEnterCS;
-            });*/
+            while (allowedToEnterCS) {
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    System.out.println(e);
+                }
+                //conditionalVariable.wait(); ??
+            }
         }
 
         isInCriticalSection = true;
